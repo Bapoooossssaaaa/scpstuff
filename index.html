@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bureau of Paranormal Control // Agent Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #FFD700; /* Gold */
+            --primary-color-transparent: rgba(255, 215, 0, 0.15);
+            --primary-color-transparent-hover: rgba(255, 215, 0, 0.3);
+        }
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+        .bg-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 1s ease-in-out;
+            filter: blur(8px);
+            transform: scale(1.1);
+        }
+        .main-bg { background-image: url('https://github.com/Bapoooossssaaaa/scpstuff/blob/main/Screenshot%202025-07-23%20063406.png?raw=true'); }
+        .armory-bg { background-image: url('https://github.com/Bapoooossssaaaa/scpstuff/blob/main/Screenshot%202025-07-23%20073043.png?raw=true'); opacity: 0; }
+        
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            overflow-y: auto; padding: 8rem 1rem 1rem 1rem;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
+            opacity: 0; transform: scale(0.98); pointer-events: none;
+        }
+        .screen.active { opacity: 1; transform: scale(1); pointer-events: auto; }
+        
+        #intro-screen {
+             padding: 1rem; /* Override padding for intro */
+        }
+
+        .card {
+            background-color: rgba(10, 10, 10, 0.75);
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%; max-width: 900px;
+        }
+        .weapon-image { transform: rotate(-15deg); transition: transform 0.3s ease; }
+        .weapon-image:hover { transform: rotate(-5deg) scale(1.05); }
+        .item-disabled { opacity: 0.4; filter: grayscale(80%); cursor: not-allowed; }
+        
+        .selected { border-color: var(--primary-color); box-shadow: 0 0 15px var(--primary-color-transparent-hover); }
+        
+        input, select {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 0.2);
+        }
+        .btn {
+            background-color: var(--primary-color-transparent);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: var(--primary-color-transparent-hover);
+            box-shadow: 0 0 10px var(--primary-color-transparent-hover);
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; color: #aaa; border-color: #aaa; }
+        
+        .modal-bg { background-color: rgba(0, 0, 0, 0.8); }
+        .bpc-title { font-weight: 700; color: var(--primary-color); }
+
+        /* Intro Cinematic */
+        #intro-screen .intro-element { opacity: 0; transition: opacity 2s ease-in-out, transform 2s ease-in-out; }
+
+        /* Notepad Style */
+        #notepad-output {
+            font-family: 'Kalam', cursive; background-color: #fdfbe9; color: #333;
+            border: 1px solid #ccc; box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+            line-height: 1.8; white-space: pre-wrap;
+            background-image: repeating-linear-gradient(to bottom, #e0e0d0, #e0e0d0 1px, transparent 1px, transparent 2.2rem);
+        }
+    </style>
+</head>
+<body>
+    <div id="background-container">
+        <div class="bg-image main-bg"></div>
+        <div class="bg-image armory-bg"></div>
+    </div>
+
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-10 p-4 flex justify-between items-center bg-black/30 backdrop-blur-md transition-opacity duration-500 opacity-0">
+        <div class="flex items-center gap-4">
+            <img src="https://github.com/Bapoooossssaaaa/scpstuff/blob/main/Adobe%20Express%20-%20file%20(4).png?raw=true" alt="Logo" class="w-12 h-12">
+            <div class="hidden sm:block">
+                <h1 class="text-xl font-bold">BPC // Agent Terminal</h1>
+                <div id="time-date" class="text-xs text-gray-400"></div>
+            </div>
+        </div>
+        <div id="settings-container" class="relative hidden">
+            <button id="settings-button" class="btn text-sm px-4 py-2 rounded font-bold">Settings</button>
+            <div id="settings-menu" class="absolute right-0 mt-2 w-48 bg-black/80 backdrop-blur-lg border border-gray-700 rounded-md shadow-lg hidden z-50">
+                <button id="skip-button-main" class="w-full text-left px-4 py-2 text-sm text-yellow-300 hover:bg-yellow-500/10">Final Format</button>
+                <button id="reset-button" class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-500/10">Reset Data</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Intro Screen -->
+        <div id="intro-screen" class="screen active">
+             <div class="text-center flex flex-col items-center gap-6">
+                <div id="intro-sequence-container" class="intro-element">
+                    <img id="intro-logo" src="https://github.com/Bapoooossssaaaa/scpstuff/blob/main/Adobe%20Express%20-%20file%20(4).png?raw=true" alt="Logo" class="w-48 h-48 md:w-64 md:h-64 object-contain mb-4 mx-auto">
+                    <h1 id="intro-title" class="text-4xl md:text-6xl bpc-title mt-4"></h1>
+                </div>
+                <div id="intro-buttons" class="intro-element mt-8">
+                    <button id="intro-button" class="btn p-3 px-6 rounded font-bold">Begin Configuration</button>
+                    <button id="skip-button" class="btn p-3 px-6 rounded font-bold hidden ml-4">Load Last Session</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screens for configuration -->
+        <div id="user-details-screen" class="screen">
+            <div class="card rounded-lg p-6 md:p-8">
+                <h2 class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">1 :: OPERATOR DETAILS</h2>
+                <div class="space-y-6">
+                    <input type="text" id="username" class="w-full p-3 rounded" placeholder="Roblox Username...">
+                    <select id="rank" class="w-full p-3 rounded">
+                        <option value="T-LR">Trial Low Rank (T-LR)</option>
+                        <option value="Main Force">Main Force</option>
+                        <option value="MR">Medium Rank (MR)</option>
+                        <option value="HR">High Rank (HR)</option>
+                        <option value="VIP">VIP / High Command</option>
+                    </select>
+                </div>
+                <div class="mt-8 flex justify-end"><button id="next-to-morph" class="btn p-3 px-6 rounded font-bold">Next &gt;</button></div>
+            </div>
+        </div>
+
+        <div id="morph-screen" class="screen">
+            <div class="card rounded-lg p-6 md:p-8">
+                <h2 class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">2 :: MORPH SELECTION</h2>
+                <div id="morph-options" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="extra-morph-options" class="mt-6 space-y-4"></div>
+                <div class="mt-8 flex justify-between">
+                    <button class="nav-btn btn p-3 px-6 rounded font-bold" data-target="user-details-screen">&lt; Back</button>
+                    <button id="next-to-armory" class="nav-btn btn p-3 px-6 rounded font-bold" data-target="armory-screen">Next &gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="armory-screen" class="screen">
+            <div class="card rounded-lg p-6 md:p-8">
+                <h2 class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">3 :: ARMORY & GEAR</h2>
+                <div id="armory-categories" class="space-y-6 max-h-[60vh] overflow-y-auto pr-2"></div>
+                <div class="mt-8 flex justify-between">
+                    <button class="nav-btn btn p-3 px-6 rounded font-bold" data-target="morph-screen">&lt; Back</button>
+                    <button id="next-to-deployment" class="btn p-3 px-6 rounded font-bold">Next &gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="deployment-screen" class="screen">
+            <div class="card rounded-lg p-6 md:p-8">
+                <h2 class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">4 :: DEPLOYMENT SITE</h2>
+                <div id="site-options" class="space-y-4">
+                    <label class="flex items-center p-4 rounded-lg border-2 border-transparent has-[:checked]:selected bg-black/20 cursor-pointer">
+                        <input type="radio" name="site" value="Site 45" class="w-5 h-5 mr-4 accent-yellow-400" checked>
+                        <div><h3 class="font-bold text-lg">Site 45</h3></div>
+                    </label>
+                    <label class="flex items-center p-4 rounded-lg border-2 border-transparent has-[:checked]:selected bg-black/20 cursor-pointer">
+                        <input type="radio" name="site" value="Site XX" class="w-5 h-5 mr-4 accent-yellow-400">
+                        <div><h3 class="font-bold text-lg">Site XX</h3></div>
+                    </label>
+                </div>
+                <div class="mt-8 flex justify-between">
+                    <button class="nav-btn btn p-3 px-6 rounded font-bold" data-target="armory-screen">&lt; Back</button>
+                    <button class="nav-btn btn p-3 px-6 rounded font-bold" data-target="output-screen">Generate Format &gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="output-screen" class="screen">
+            <div class="card rounded-lg p-6 md:p-8">
+                <h2 id="output-title" class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">5 :: GENERATED FORMAT</h2>
+                <div id="notepad-output" class="w-full h-80 p-4 rounded font-mono text-sm overflow-y-auto"></div>
+                <div class="mt-8 flex justify-between items-center">
+                    <button class="nav-btn btn p-3 px-6 rounded font-bold" data-target="deployment-screen">&lt; Back</button>
+                    <div class="flex items-center gap-4">
+                        <button id="copy-button" class="btn p-3 px-6 rounded font-bold">Copy</button>
+                        <button id="finish-button" class="btn p-3 px-6 rounded font-bold">Finish & Exit</button>
+                    </div>
+                    <span id="copy-feedback" class="ml-4 text-green-400 opacity-0 transition-opacity">Copied!</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Container -->
+    <div id="modal-container" class="fixed inset-0 z-50 items-center justify-center hidden modal-bg">
+        <!-- Rank Code Modal -->
+        <div id="rankCodeModal" class="card rounded-lg p-8 w-11/12 max-w-md mx-auto hidden">
+            <h3 class="text-xl font-bold mb-4 bpc-title">AUTHORIZATION REQUIRED</h3>
+            <input type="password" id="rankCodeInput" class="w-full p-2 rounded mb-4" placeholder="Enter Code...">
+            <div class="flex justify-end space-x-4">
+                <button id="cancelRankCode" class="btn bg-gray-600 border-gray-500 hover:bg-gray-500">Cancel</button>
+                <button id="submitRankCode" class="btn">Submit</button>
+            </div>
+        </div>
+        <!-- Error Modal -->
+         <div id="errorModal" class="card rounded-lg p-8 w-11/12 max-w-md mx-auto hidden text-center">
+            <h3 class="text-xl font-bold mb-4 text-red-500">ACCESS DENIED</h3>
+            <p id="error-message" class="text-gray-300 mb-6"></p>
+            <button id="error-ok-button" class="btn px-6 py-2">OK</button>
+        </div>
+    </div>
+    
+    <!-- Outro Screen -->
+    <div id="outro-screen" class="fixed inset-0 z-50 items-center justify-center hidden modal-bg">
+         <h2 class="text-4xl text-white font-bold">Have a nice day.</h2>
+    </div>
+
+    <script type="module">
+        // --- DATA & CONFIG ---
+        const affiliations = { "Site 45": { name: "Neutral", id: "107846193234134" }, "Site XX": { name: "SCP Affiliated", id: "15501925503" } };
+        const morphs = { "T-LR": { name: "Trial Low Rank", hats: "15177885362,110283265124773,17266468821,9240208744,18291250101,Kneepads,14973512227,15177836845" }, "Main Force": { name: "Main Force", hats: "13961211061,14127734564,110283265124773,17266468821,9240208744,15177885362,103647562768082,12358955210,13834560407,18291250101,Kneepads,17172715247,jsnvg 215 166 69,15177836845" }, "MR": { name: "Medium Rank", hats: "13961211061,14127734564,18291250101,103647562768082,12358955210,Kneepads,17172715247,{nvg},112835114467251,15501925503,15177836845,110283265124773,9240208744,13834560407", options: { nvg: { label: "NVG Choice", type: "radio", default: "qnvg 215 166 69", choices: { "qnvg 215 166 69": "QNVG", "jsnvg 215 166 69": "JSNVG" } } } }, "HR": { name: "High Rank", hats: "78787802875634,4684658997,18291250101,15177836845,15177885362,9240208744,110283265124773,Kneepads,13744649136" }, "VIP": { name: "VIP / High Command", hats: "18291250101,15177836845,15177885362,9240208744,110283265124773,Kneepads", options: { customHats: { label: "Custom Hats (IDs, comma-separated)", type: "text", placeholder: "e.g., 12345,67890" } } } };
+        Object.keys(morphs).forEach(key => {
+            const morph = morphs[key];
+            const nameKey = key.split(' ')[0];
+            morph.img = `https://github.com/Bapoooossssaaaa/scpstuff/blob/main/Screenshot%202025-07-23%2006${{ "T-LR": 1520, "Main": 1802, "MR": 2124, "HR": 2434, "VIP": 2534 }[nameKey]}.png?raw=true`;
+            morph.shirt = "123273793302854"; morph.pants = "94888803170295";
+        });
+        const rankOrder = ["T-LR", "Main Force", "MR", "HR", "VIP"];
+        const armory = { "Rifles": { "aac": { name: "AAC Honey Badger", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/AAC_Honey_Badger.webp" }, "arx": { name: "ARX-200", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/ARX-200.webp" }, "hk": { name: "HK416", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/HK416.webp" }, "Hellion": { name: "Hellion", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/Hellion.webp" } }, "Submachine Guns": { "P90": { name: "P90", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/P90.webp" }, "MP5": { name: "MP5", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/MP5.webp" }, "evo": { name: "Evo 3 Micro", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/EVO_3_Micro.webp" } }, "Sidearms": { "M9": { name: "M9", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/M9.webp" }, "Glock": { name: "Glock-17", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/Glock-17_Transparent.webp" } }, "Miscellaneous": { "Crowbar": { name: "Baton", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/noFilter.webp" }, "detain": { name: "Detain Tool", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/Detain_Example.webp" }, "Medkit 5 Black": { name: "Medkit", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/Black_Medkit.webp" } } };
+        const weaponTypes = { "Rifles": "Primary", "Submachine Guns": "Flexible", "Sidearms": "Secondary" };
+        
+        // --- SECURITY & OBFUSCATION ---
+        const auth_matrix = { "Main Force": "bW9uYXJjaA", "MR": "cGFyYWdvbg", "HR": "dGVyYWdyYW0", "VIP": "ZXhhdG9u" }; // Base64
+
+        // --- STATE ---
+        let state = { username: '', rank: 'T-LR', selectedMorph: 'T-LR', deploymentSite: 'Site 45', morphOptions: {}, primaryWeapon: null, secondaryWeapon: null, misc: [], isDataLoaded: false };
+        let previousRank = 'T-LR';
+
+        // --- DOM ELEMENTS ---
+        const dom = {
+            mainHeader: document.getElementById('main-header'),
+            screens: document.querySelectorAll('main .screen'), navButtons: document.querySelectorAll('.nav-btn'),
+            introButton: document.getElementById('intro-button'), skipButton: document.getElementById('skip-button'),
+            settings: { container: document.getElementById('settings-container'), button: document.getElementById('settings-button'), menu: document.getElementById('settings-menu'), skip: document.getElementById('skip-button-main'), reset: document.getElementById('reset-button') },
+            username: document.getElementById('username'), rank: document.getElementById('rank'),
+            nextToMorph: document.getElementById('next-to-morph'), nextToArmory: document.getElementById('next-to-armory'),
+            nextToDeployment: document.getElementById('next-to-deployment'),
+            morphOptions: document.getElementById('morph-options'), extraMorphOptions: document.getElementById('extra-morph-options'),
+            armory: document.getElementById('armory-categories'), siteOptions: document.getElementById('site-options'),
+            outputTitle: document.getElementById('output-title'), notepadOutput: document.getElementById('notepad-output'),
+            copyButton: document.getElementById('copy-button'), finishButton: document.getElementById('finish-button'), copyFeedback: document.getElementById('copy-feedback'),
+            timeDate: document.getElementById('time-date'),
+            modalContainer: document.getElementById('modal-container'),
+            rankCodeModal: document.getElementById('rankCodeModal'),
+            errorModal: document.getElementById('errorModal'),
+            errorMessage: document.getElementById('error-message'),
+            errorOkButton: document.getElementById('error-ok-button'),
+            rankCodeInput: document.getElementById('rankCodeInput'),
+            submitRankCode: document.getElementById('submitRankCode'),
+            cancelRankCode: document.getElementById('cancelRankCode'),
+            bgArmory: document.querySelector('.armory-bg'),
+            intro: { screen: document.getElementById('intro-screen'), container: document.getElementById('intro-sequence-container'), logo: document.getElementById('intro-logo'), title: document.getElementById('intro-title'), buttons: document.getElementById('intro-buttons') },
+            outroScreen: document.getElementById('outro-screen'),
+        };
+
+        const DB = { save: (data) => localStorage.setItem('bpcMorphDataV12', JSON.stringify(data)), load: () => JSON.parse(localStorage.getItem('bpcMorphDataV12')), clear: () => localStorage.removeItem('bpcMorphDataV12') };
+        
+        // --- FUNCTIONS ---
+        function validate_session() { return typeof state === 'object' && state !== null; }
+
+        function showScreen(screenId) {
+            if (!validate_session()) return;
+            dom.screens.forEach(screen => screen.classList.toggle('active', screen.id === screenId));
+            dom.bgArmory.style.opacity = screenId === 'armory-screen' ? '1' : '0';
+            
+            if(screenId !== 'intro-screen') {
+                dom.mainHeader.style.opacity = 1;
+            } else {
+                dom.mainHeader.style.opacity = 0;
+            }
+
+            if (screenId === 'output-screen') generateOutput();
+            if (screenId === 'morph-screen') renderMorphs();
+            if (screenId === 'armory-screen') renderArmory();
+        }
+
+        function renderMorphs() {
+            dom.morphOptions.innerHTML = '';
+            const userRankIndex = rankOrder.indexOf(state.rank);
+            rankOrder.forEach((rankKey, index) => {
+                const morph = morphs[rankKey];
+                const isUnlocked = index <= userRankIndex;
+                const isSelected = state.selectedMorph === rankKey;
+                const card = document.createElement('div');
+                card.className = `border-2 rounded-lg p-4 transition-all duration-300 ${isUnlocked ? 'cursor-pointer' : 'item-disabled'} ${isSelected && isUnlocked ? 'selected' : 'border-transparent'}`;
+                card.dataset.morphId = rankKey;
+                card.innerHTML = `<img src="${morph.img}" alt="${morph.name}" class="w-full h-48 object-contain rounded-md mb-2"><h3 class="font-bold text-center">${morph.name}</h3>`;
+                if (isUnlocked) card.addEventListener('click', () => { state.selectedMorph = rankKey; state.morphOptions = {}; renderAll(); });
+                dom.morphOptions.appendChild(card);
+            });
+            dom.nextToArmory.disabled = userRankIndex < rankOrder.indexOf(state.selectedMorph);
+            renderExtraMorphOptions();
+        }
+
+        function renderExtraMorphOptions() {
+            dom.extraMorphOptions.innerHTML = '';
+            const selectedMorphData = morphs[state.selectedMorph];
+            if (!selectedMorphData || !selectedMorphData.options) return;
+            Object.entries(selectedMorphData.options).forEach(([key, option]) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'p-3 rounded-md bg-black/20';
+                let inputHtml = `<h3 class="block mb-2 text-sm font-bold text-yellow-200">${option.label}</h3>`;
+                if (option.type === 'radio') {
+                    inputHtml += '<div class="flex flex-wrap gap-x-4 gap-y-2">';
+                    Object.entries(option.choices).forEach(([value, label]) => {
+                        const isChecked = (state.morphOptions[key] || option.default) === value;
+                        inputHtml += `<label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="${key}" value="${value}" class="morph-option-input accent-yellow-400" data-option-key="${key}" ${isChecked ? 'checked' : ''}><span>${label}</span></label>`;
+                    });
+                    inputHtml += '</div>';
+                } else if (option.type === 'text') {
+                    inputHtml += `<input type="text" class="morph-option-input w-full p-2 rounded" data-option-key="${key}" placeholder="${option.placeholder || ''}" value="${state.morphOptions[key] || ''}">`;
+                }
+                wrapper.innerHTML = inputHtml;
+                dom.extraMorphOptions.appendChild(wrapper);
+            });
+        }
+
+        function isSMG(cmd) {
+            return cmd && armory['Submachine Guns'].hasOwnProperty(cmd);
+        }
+
+        function renderArmory() {
+            dom.armory.innerHTML = '';
+            const userRankIndex = rankOrder.indexOf(state.rank);
+            Object.entries(armory).forEach(([category, items]) => {
+                const div = document.createElement('div');
+                let html = `<h3 class="text-xl font-bold mb-3 text-yellow-300">${category}</h3><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">`;
+                Object.entries(items).forEach(([cmd, item]) => {
+                    let isDisabled = false;
+                    if (state.rank === 'T-LR') {
+                        if (category === 'Rifles' || category === 'Miscellaneous') isDisabled = true;
+                    }
+                    if (cmd === 'Crowbar' && userRankIndex < rankOrder.indexOf('MR')) isDisabled = true;
+                    if (cmd === 'detain' && userRankIndex < rankOrder.indexOf('HR')) isDisabled = true;
+                    
+
+                    const isSelected = state.primaryWeapon === cmd || state.secondaryWeapon === cmd || state.misc.includes(cmd);
+                    const isMisc = category === 'Miscellaneous';
+                    html += `<div class="armory-item border-2 bg-black/30 p-2 rounded-lg transition-all duration-300 ${isDisabled ? 'item-disabled' : 'cursor-pointer'} ${isSelected && !isDisabled ? 'selected' : 'border-transparent'}" data-item-cmd="${cmd}" data-item-category="${category}" data-item-disabled="${isDisabled}">
+                        <img src="${item.img}" alt="${item.name}" class="w-full h-20 object-contain mx-auto ${isMisc ? '' : 'weapon-image'}"><p class="text-center text-xs mt-2">${item.name}</p></div>`;
+                });
+                div.innerHTML = html + `</div>`;
+                dom.armory.appendChild(div);
+            });
+            dom.nextToDeployment.disabled = !state.primaryWeapon && !state.secondaryWeapon;
+        }
+
+        function handleArmoryClick(e) {
+            const itemEl = e.target.closest('.armory-item');
+            if (!itemEl || itemEl.dataset.itemDisabled === 'true') return;
+
+            const cmd = itemEl.dataset.itemCmd;
+            const category = itemEl.dataset.itemCategory;
+            const type = weaponTypes[category] || 'Misc';
+
+            if (type === 'Misc') {
+                state.misc = state.misc.includes(cmd) ? state.misc.filter(i => i !== cmd) : [...state.misc, cmd];
+            } else if (type === 'Primary') {
+                if (isSMG(cmd) && isSMG(state.secondaryWeapon)) {
+                    showError("Loadout violation: Only one SMG may be equipped at a time.");
+                    return;
+                }
+                state.primaryWeapon = state.primaryWeapon === cmd ? null : cmd;
+            } else if (type === 'Secondary') {
+                 if (isSMG(cmd) && isSMG(state.primaryWeapon)) {
+                    showError("Loadout violation: Only one SMG may be equipped at a time.");
+                    return;
+                }
+                state.secondaryWeapon = state.secondaryWeapon === cmd ? null : cmd;
+            } else if (type === 'Flexible') { // SMG Logic
+                if (state.primaryWeapon === cmd) { // Deselecting from primary
+                    state.primaryWeapon = null;
+                } else if (state.secondaryWeapon === cmd) { // Deselecting from secondary
+                    state.secondaryWeapon = null;
+                } else if (!state.primaryWeapon && !isSMG(state.secondaryWeapon)) { // Equip as primary if primary empty and secondary is not SMG
+                    state.primaryWeapon = cmd;
+                } else if (!state.secondaryWeapon && !isSMG(state.primaryWeapon)) { // Equip as secondary if secondary empty and primary is not SMG
+                    state.secondaryWeapon = cmd;
+                } else { 
+                    showError("Loadout violation: An SMG is already equipped or both weapon slots are full.");
+                }
+            }
+            renderArmory(); saveData();
+        }
+
+        function generateOutput() {
+            dom.outputTitle.textContent = `5 :: GENERATED FORMAT`;
+            const user = state.username || '{username}';
+            const selectedMorphData = morphs[state.selectedMorph];
+            if (!selectedMorphData) return;
+            let hatString = selectedMorphData.hats;
+            if (selectedMorphData.options) {
+                Object.entries(selectedMorphData.options).forEach(([key, option]) => {
+                    const value = state.morphOptions[key] || option.default || "";
+                    if (option.type === 'radio') hatString = hatString.replace(`{${key}}`, value);
+                    else if (option.type === 'text' && value) hatString += `,${value}`;
+                });
+            }
+            const affiliation = affiliations[state.deploymentSite];
+            if (affiliation) hatString += `,${affiliation.id}`;
+            hatString = hatString.replace(/,+/g, ',').replace(/^,|,$/g, '');
+            const medkitCmd = "Medkit 5 Black";
+            const gearItems = [state.primaryWeapon, state.secondaryWeapon, ...state.misc.filter(i => i !== medkitCmd)].filter(Boolean);
+            let gearString = "EMF";
+            if (gearItems.length > 0) gearString += `,${gearItems.join(',')}`;
+            if (state.misc.includes(medkitCmd)) gearString += `,${medkitCmd}`;
+            const outputArray = [`(${state.deploymentSite})`, `permhat ${user} ${hatString}`, `permshirt ${user} ${selectedMorphData.shirt}`, `permpants ${user} ${selectedMorphData.pants}`, `permface ${user} 0`, `permntag ${user} (TBD)`, `permrtag ${user} (TBD)`, `permcntag ${user} (TBD)`, `permcrtag ${user} (TBD)`, `permgear ${user} ${gearString}`, `permaxhealth ${user} (TBD)`, `heal ${user}`];
+            dom.notepadOutput.textContent = outputArray.join('\n');
+        }
+
+        function handleRankChange(e) {
+            const newRank = e.target.value;
+            if (auth_matrix[newRank]) {
+                dom.modalContainer.style.display = 'flex';
+                dom.rankCodeModal.style.display = 'block';
+                dom.errorModal.style.display = 'none';
+            } else {
+                state.rank = newRank; previousRank = newRank;
+                if (rankOrder.indexOf(state.selectedMorph) > rankOrder.indexOf(state.rank)) state.selectedMorph = state.rank;
+                saveData();
+            }
+        }
+        
+        function showError(message) {
+            dom.errorMessage.textContent = message;
+            dom.modalContainer.style.display = 'flex';
+            dom.rankCodeModal.style.display = 'none';
+            dom.errorModal.style.display = 'block';
+        }
+
+        function handleRankCodeSubmit() {
+            const enteredCode = dom.rankCodeInput.value;
+            const targetRank = dom.rank.value;
+            if (auth_matrix[targetRank] && enteredCode === atob(auth_matrix[targetRank])) {
+                state.rank = targetRank; previousRank = targetRank;
+                dom.modalContainer.style.display = 'none'; dom.rankCodeInput.value = '';
+                saveData();
+            } else {
+                dom.rank.value = previousRank;
+                dom.rankCodeInput.value = '';
+                showError('Incorrect authorization code. Please consult a supervisor or the designated channels if you cannot locate the correct code.');
+            }
+        }
+
+        function saveData() { if (state.isDataLoaded) DB.save(state); }
+        function loadData() {
+            const loadedState = DB.load();
+            if (loadedState) {
+                console.log("Returning user detected. Displaying settings.");
+                if (morphs[loadedState.selectedMorph]) state = loadedState;
+                dom.skipButton.classList.remove('hidden');
+                dom.settings.container.classList.remove('hidden');
+            }
+            state.isDataLoaded = true;
+            dom.username.value = state.username; dom.rank.value = state.rank; previousRank = state.rank;
+            document.querySelector(`input[name="site"][value="${state.deploymentSite}"]`).checked = true;
+        }
+        
+        function renderAll() { renderMorphs(); renderExtraMorphOptions(); saveData(); }
+
+        function runIntro() {
+            setTimeout(() => {
+                dom.intro.container.style.opacity = 1;
+                dom.intro.container.style.transform = 'scale(1)';
+                setTimeout(() => {
+                    dom.intro.title.textContent = "Bureau of Paranormal Control";
+                    setTimeout(() => {
+                         dom.intro.buttons.style.opacity = 1;
+                    }, 1500);
+                }, 1500);
+            }, 1000);
+        }
+        
+        function updateTime() {
+            dom.timeDate.textContent = new Date().toLocaleString();
+        }
+
+        // --- EVENT LISTENERS ---
+        dom.introButton.addEventListener('click', () => showScreen('user-details-screen'));
+        dom.skipButton.addEventListener('click', () => showScreen('output-screen'));
+        dom.settings.skip.addEventListener('click', () => showScreen('output-screen'));
+        dom.settings.reset.addEventListener('click', () => { if (confirm("Are you sure you want to reset all saved data? This action cannot be undone.")) { DB.clear(); location.reload(); } });
+        dom.settings.button.addEventListener('click', () => dom.settings.menu.classList.toggle('hidden'));
+        dom.navButtons.forEach(button => button.addEventListener('click', (e) => showScreen(e.target.dataset.target)));
+        dom.nextToMorph.addEventListener('click', () => { if (dom.username.value.trim() === '') { showError('Username is required to proceed.'); return; } showScreen('morph-screen'); });
+        dom.nextToDeployment.addEventListener('click', () => {
+            if (!state.primaryWeapon && !state.secondaryWeapon) {
+                showError('Loadout violation: You must select at least one Primary or Secondary weapon to proceed.');
+                return;
+            }
+            showScreen('deployment-screen');
+        });
+        dom.username.addEventListener('input', (e) => { state.username = e.target.value; saveData(); });
+        dom.rank.addEventListener('change', handleRankChange);
+        dom.submitRankCode.addEventListener('click', handleRankCodeSubmit);
+        dom.cancelRankCode.addEventListener('click', () => { dom.rank.value = previousRank; dom.modalContainer.style.display = 'none'; });
+        dom.errorOkButton.addEventListener('click', () => dom.modalContainer.style.display = 'none');
+        dom.armory.addEventListener('click', handleArmoryClick);
+        dom.extraMorphOptions.addEventListener('change', (e) => { const input = e.target.closest('.morph-option-input'); if (!input) return; state.morphOptions[input.dataset.optionKey] = input.value; renderAll(); });
+        dom.siteOptions.addEventListener('change', (e) => { state.deploymentSite = e.target.value; saveData(); });
+        dom.copyButton.addEventListener('click', () => {
+            saveData();
+            const textToCopy = dom.notepadOutput.textContent;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            dom.copyFeedback.style.opacity = '1';
+            setTimeout(() => { dom.copyFeedback.style.opacity = '0'; }, 2000);
+        });
+        dom.finishButton.addEventListener('click', () => {
+            saveData();
+            dom.outroScreen.style.display = 'flex';
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        });
+
+        // --- INITIALIZATION ---
+        function init() { 
+            loadData(); 
+            renderAll(); 
+            runIntro();
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+        init();
+    </script>
+</body>
+</html>
