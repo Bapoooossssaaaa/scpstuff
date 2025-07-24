@@ -90,6 +90,24 @@
             line-height: 1.8; white-space: pre-wrap;
             background-image: repeating-linear-gradient(to bottom, #e0e0d0, #e0e0d0 1px, transparent 1px, transparent 2.2rem);
         }
+        
+        .gold-gradient-text {
+            background: linear-gradient(90deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-animation 5s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .volume-slider {
+            accent-color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -98,7 +116,7 @@
         <div class="bg-image armory-bg"></div>
     </div>
 
-    <header id="main-header" class="fixed top-0 left-0 right-0 z-10 p-4 flex justify-between items-center bg-black/30 backdrop-blur-md transition-opacity duration-500 opacity-0">
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-20 p-4 flex justify-between items-center bg-black/30 backdrop-blur-md transition-opacity duration-500 opacity-0">
         <div class="flex items-center gap-4">
             <img src="https://github.com/Bapoooossssaaaa/scpstuff/blob/main/Adobe%20Express%20-%20file%20(4).png?raw=true" alt="Logo" class="w-12 h-12">
             <div class="hidden sm:block">
@@ -106,11 +124,25 @@
                 <div id="time-date" class="text-xs text-gray-400"></div>
             </div>
         </div>
-        <div id="settings-container" class="relative hidden">
-            <button id="settings-button" class="btn text-sm px-4 py-2 rounded font-bold">Settings</button>
-            <div id="settings-menu" class="absolute right-0 mt-2 w-48 bg-black/80 backdrop-blur-lg border border-gray-700 rounded-md shadow-lg hidden z-50">
-                <button id="skip-button-main" class="w-full text-left px-4 py-2 text-sm text-yellow-300 hover:bg-yellow-500/10">Final Format</button>
-                <button id="reset-button" class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-500/10">Reset Data</button>
+        <div class="flex items-center gap-6">
+             <div id="music-player" class="flex items-center gap-2">
+                <button id="skip-song-button" class="text-yellow-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
+                </button>
+                <button id="mute-button" class="text-yellow-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                </button>
+                <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.3" class="w-24 volume-slider">
+                <div class="text-xs w-48 text-right">
+                    <p class="truncate gold-gradient-text" id="song-info">Click anywhere to start music</p>
+                </div>
+            </div>
+            <div id="settings-container" class="relative hidden">
+                <button id="settings-button" class="btn text-sm px-4 py-2 rounded font-bold">Settings</button>
+                <div id="settings-menu" class="absolute right-0 mt-2 w-48 bg-black/80 backdrop-blur-lg border border-gray-700 rounded-md shadow-lg hidden z-50">
+                    <button id="skip-button-main" class="w-full text-left px-4 py-2 text-sm text-yellow-300 hover:bg-yellow-500/10">Final Format</button>
+                    <button id="reset-button" class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-500/10">Reset Data</button>
+                </div>
             </div>
         </div>
     </header>
@@ -140,21 +172,32 @@
                         <option value="T-LR">Trial Low Rank (T-LR)</option>
                         <option value="Main Force">Main Force</option>
                         <option value="MR">Medium Rank (MR)</option>
-                        <option value="HR">High Rank (HR)</option>
-                        <option value="VIP">VIP / High Command</option>
+                        <option value="HR">High Rank+</option>
+                        <option value="VIP">Custom Morph</option>
                     </select>
                 </div>
-                <div class="mt-8 flex justify-end"><button id="next-to-morph" class="btn p-3 px-6 rounded font-bold">Next &gt;</button></div>
+                <div class="mt-8 flex justify-end"><button id="next-to-role" class="btn p-3 px-6 rounded font-bold">Next &gt;</button></div>
+            </div>
+        </div>
+        
+        <div id="role-screen" class="screen">
+            <div class="card rounded-lg p-6 md:p-8">
+                <h2 class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">2 :: ROLE SELECTION</h2>
+                <div id="role-options" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                <div class="mt-8 flex justify-between">
+                    <button class="nav-btn btn p-3 px-6 rounded font-bold" data-target="user-details-screen">&lt; Back</button>
+                    <button id="next-to-morph" class="nav-btn btn p-3 px-6 rounded font-bold" data-target="morph-screen">Next &gt;</button>
+                </div>
             </div>
         </div>
 
         <div id="morph-screen" class="screen">
             <div class="card rounded-lg p-6 md:p-8">
-                <h2 class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">2 :: MORPH SELECTION</h2>
+                <h2 class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">3 :: MORPH SELECTION</h2>
                 <div id="morph-options" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 <div id="extra-morph-options" class="mt-6 space-y-4"></div>
                 <div class="mt-8 flex justify-between">
-                    <button class="nav-btn btn p-3 px-6 rounded font-bold" data-target="user-details-screen">&lt; Back</button>
+                    <button class="nav-btn btn p-3 px-6 rounded font-bold" data-target="role-screen">&lt; Back</button>
                     <button id="next-to-armory" class="nav-btn btn p-3 px-6 rounded font-bold" data-target="armory-screen">Next &gt;</button>
                 </div>
             </div>
@@ -162,8 +205,16 @@
 
         <div id="armory-screen" class="screen">
             <div class="card rounded-lg p-6 md:p-8">
-                <h2 class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">3 :: ARMORY & GEAR</h2>
-                <div id="armory-categories" class="space-y-6 max-h-[60vh] overflow-y-auto pr-2"></div>
+                <h2 class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">4 :: ARMORY & GEAR</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div id="armory-content" class="md:col-span-2 space-y-6 max-h-[60vh] overflow-y-auto pr-2">
+                        <div id="armor-options" class="space-y-4"></div>
+                        <div id="armory-categories" class="space-y-6"></div>
+                    </div>
+                    <div id="stats-panel" class="md:col-span-1 bg-black/20 p-4 rounded-lg h-full">
+                        <!-- Stats will be injected here -->
+                    </div>
+                </div>
                 <div class="mt-8 flex justify-between">
                     <button class="nav-btn btn p-3 px-6 rounded font-bold" data-target="morph-screen">&lt; Back</button>
                     <button id="next-to-deployment" class="btn p-3 px-6 rounded font-bold">Next &gt;</button>
@@ -173,15 +224,15 @@
 
         <div id="deployment-screen" class="screen">
             <div class="card rounded-lg p-6 md:p-8">
-                <h2 class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">4 :: DEPLOYMENT SITE</h2>
+                <h2 class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">5 :: DEPLOYMENT SITE</h2>
                 <div id="site-options" class="space-y-4">
                     <label class="flex items-center p-4 rounded-lg border-2 border-transparent has-[:checked]:selected bg-black/20 cursor-pointer">
                         <input type="radio" name="site" value="Site 45" class="w-5 h-5 mr-4 accent-yellow-400" checked>
-                        <div><h3 class="font-bold text-lg">Site 45</h3></div>
+                        <div><h3 class="font-bold text-lg">Site 45</h3><p class="text-sm text-gray-400">Relation: <span class="text-gray-300 font-bold">Neutral</span></p></div>
                     </label>
                     <label class="flex items-center p-4 rounded-lg border-2 border-transparent has-[:checked]:selected bg-black/20 cursor-pointer">
                         <input type="radio" name="site" value="Site XX" class="w-5 h-5 mr-4 accent-yellow-400">
-                        <div><h3 class="font-bold text-lg">Site XX</h3></div>
+                        <div><h3 class="font-bold text-lg">Site XX</h3><p class="text-sm text-gray-400">Relation: <span class="text-yellow-400 font-bold">Foundation Aligned</span></p></div>
                     </label>
                 </div>
                 <div class="mt-8 flex justify-between">
@@ -193,7 +244,7 @@
 
         <div id="output-screen" class="screen">
             <div class="card rounded-lg p-6 md:p-8">
-                <h2 id="output-title" class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">5 :: GENERATED FORMAT</h2>
+                <h2 id="output-title" class="text-2xl md:text-3xl mb-6 border-b-2 border-gray-600 pb-3 bpc-title">6 :: GENERATED FORMAT</h2>
                 <div id="notepad-output" class="w-full h-80 p-4 rounded font-mono text-sm overflow-y-auto"></div>
                 <div class="mt-8 flex justify-between items-center">
                     <button class="nav-btn btn p-3 px-6 rounded font-bold" data-target="deployment-screen">&lt; Back</button>
@@ -231,10 +282,12 @@
          <h2 class="text-4xl text-white font-bold">Have a nice day.</h2>
     </div>
 
+    <audio id="audio-player" loop></audio>
+
     <script type="module">
         // --- DATA & CONFIG ---
         const affiliations = { "Site 45": { name: "Neutral", id: "107846193234134" }, "Site XX": { name: "SCP Affiliated", id: "15501925503" } };
-        const morphs = { "T-LR": { name: "Trial Low Rank", hats: "15177885362,110283265124773,17266468821,9240208744,18291250101,Kneepads,14973512227,15177836845" }, "Main Force": { name: "Main Force", hats: "13961211061,14127734564,110283265124773,17266468821,9240208744,15177885362,103647562768082,12358955210,13834560407,18291250101,Kneepads,17172715247,jsnvg 215 166 69,15177836845" }, "MR": { name: "Medium Rank", hats: "13961211061,14127734564,18291250101,103647562768082,12358955210,Kneepads,17172715247,{nvg},112835114467251,15501925503,15177836845,110283265124773,9240208744,13834560407", options: { nvg: { label: "NVG Choice", type: "radio", default: "qnvg 215 166 69", choices: { "qnvg 215 166 69": "QNVG", "jsnvg 215 166 69": "JSNVG" } } } }, "HR": { name: "High Rank", hats: "78787802875634,4684658997,18291250101,15177836845,15177885362,9240208744,110283265124773,Kneepads,13744649136" }, "VIP": { name: "VIP / High Command", hats: "18291250101,15177836845,15177885362,9240208744,110283265124773,Kneepads", options: { customHats: { label: "Custom Hats (IDs, comma-separated)", type: "text", placeholder: "e.g., 12345,67890" } } } };
+        const morphs = { "T-LR": { name: "Trial Low Rank", hats: "15177885362,110283265124773,17266468821,9240208744,18291250101,Kneepads,14973512227,15177836845" }, "Main Force": { name: "Main Force", hats: "13961211061,14127734564,110283265124773,17266468821,9240208744,15177885362,103647562768082,12358955210,13834560407,18291250101,Kneepads,17172715247,jsnvg 215 166 69,15177836845" }, "MR": { name: "Medium Rank", hats: "13961211061,14127734564,18291250101,103647562768082,12358955210,Kneepads,17172715247,{nvg},112835114467251,15177836845,110283265124773,9240208744,13834560407,12358955210,15177885362" }, "HR": { name: "High Rank+", hats: "78787802875634,4684658997,18291250101,15177836845,15177885362,9240208744,110283265124773,Kneepads,13744649136" }, "VIP": { name: "Custom Morph", hats: "18291250101,15177836845,15177885362,9240208744,110283265124773,Kneepads", options: { customHats: { label: "Custom Hats (IDs, comma-separated)", type: "text", placeholder: "e.g., 12345,67890" } } } };
         Object.keys(morphs).forEach(key => {
             const morph = morphs[key];
             const nameKey = key.split(' ')[0];
@@ -242,15 +295,29 @@
             morph.shirt = "123273793302854"; morph.pants = "94888803170295";
         });
         const rankOrder = ["T-LR", "Main Force", "MR", "HR", "VIP"];
-        const armory = { "Rifles": { "aac": { name: "AAC Honey Badger", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/AAC_Honey_Badger.webp" }, "arx": { name: "ARX-200", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/ARX-200.webp" }, "hk": { name: "HK416", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/HK416.webp" }, "Hellion": { name: "Hellion", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/Hellion.webp" } }, "Submachine Guns": { "P90": { name: "P90", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/P90.webp" }, "MP5": { name: "MP5", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/MP5.webp" }, "evo": { name: "Evo 3 Micro", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/EVO_3_Micro.webp" } }, "Sidearms": { "M9": { name: "M9", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/M9.webp" }, "Glock": { name: "Glock-17", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/Glock-17_Transparent.webp" } }, "Miscellaneous": { "Crowbar": { name: "Baton", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/noFilter.webp" }, "detain": { name: "Detain Tool", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/Detain_Example.webp" }, "Medkit 5 Black": { name: "Medkit", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/Black_Medkit.webp" } } };
+        const armory = {
+            "Rifles": { "arx": { name: "ARX-200", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/ARX-200.webp", stats: { "Base Damage": 11.75, "Rate of Fire": 700, "Magazine Size": 30, "Reload Time": 3, "Reserve Ammo": 5000, "Weight": -4.5, "Muzzle Velocity": 920, "Ammo Type": "Supersonic" } }, "Hellion": { name: "Hellion", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/Hellion.webp", stats: { "Base Damage": 9.75, "Rate of Fire": 860, "Magazine Size": 30, "Reload Time": 3, "Reserve Ammo": 5000, "Weight": -3.629, "Muzzle Velocity": 940, "Ammo Type": "Supersonic" } }, "hk": { name: "HK416", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/HK416.webp", stats: { "Base Damage": 8.75, "Rate of Fire": 900, "Magazine Size": 30, "Reload Time": 2.75, "Reserve Ammo": 5000, "Weight": -3.85, "Muzzle Velocity": 900, "Ammo Type": "Supersonic" } }, "aac": { name: "AAC Honey Badger", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/AAC_Honey_Badger.webp", stats: { "Base Damage": 10, "Rate of Fire": 800, "Magazine Size": 30, "Reload Time": 2.25, "Reserve Ammo": 5000, "Weight": -3.4, "Muzzle Velocity": 640, "Ammo Type": "Subsonic" } } },
+            "Submachine Guns": { "P90": { name: "P90", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/P90.webp", stats: { "Base Damage": 8.25, "Rate of Fire": 909, "Magazine Size": 50, "Reload Time": 4, "Reserve Ammo": 5000, "Weight": -2.6, "Muzzle Velocity": 715, "Ammo Type": "Subsonic" } }, "MP5": { name: "MP5", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/MP5.webp", stats: { "Base Damage": 9.5, "Rate of Fire": 800, "Magazine Size": 40, "Reload Time": 2.75, "Reserve Ammo": 5000, "Weight": -3.4, "Muzzle Velocity": 400, "Ammo Type": "Subsonic" } }, "evo": { name: "Evo 3 Micro", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/EVO_3_Micro.webp", stats: { "Base Damage": 6.5, "Rate of Fire": 1200, "Magazine Size": 40, "Reload Time": 2.9, "Reserve Ammo": 5000, "Weight": -2.3, "Muzzle Velocity": 357, "Ammo Type": "Subsonic" } } },
+            "Sidearms": { "Glock": { name: "Glock-17", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/Glock-17_Transparent.webp", stats: { "Base Damage": 18, "Rate of Fire": 240, "Magazine Size": 17, "Reload Time": 1.5, "Reserve Ammo": 340, "Weight": -0.3, "Muzzle Velocity": 375, "Ammo Type": "Subsonic" } }, "M9": { name: "M9", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/M9.webp", stats: { "Base Damage": 10.5, "Rate of Fire": 333, "Magazine Size": 15, "Reload Time": 1.6, "Reserve Ammo": 300, "Weight": -1.16, "Muzzle Velocity": 381, "Ammo Type": "Subsonic" } } },
+            "Miscellaneous": { "Crowbar": { name: "Baton", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/noFilter.webp", stats: { "Description": "It's actually a crowbar." } }, "detain": { name: "Detain Tool", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/Detain_Example.webp", stats: { "Description": "Allows the ability to put people in cuffs. HR+ Only." } }, "Medkit 5 Black": { name: "Medkit", img: "https://raw.githubusercontent.com/Bapoooossssaaaa/scpstuff/refs/heads/main/Black_Medkit.webp", stats: { "Description": "5 Charges, slick black look." } }, "auth_tool": { name: "Auth Tool", img: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMGZmMDAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTQgMi41TDQgMTggMTAgMTggOSAyMyAyMCA2IDE0IDYgMTQgMi41WiIvPjwvc3ZnPg==", stats: { "Description": "Allows authorization of Class-D/Test Subjects for testing or questioning. LR Only." } } }
+        };
         const weaponTypes = { "Rifles": "Primary", "Submachine Guns": "Flexible", "Sidearms": "Secondary" };
+        const armorPlating = { "Light": { name: "Light Armor Plating", health: 10, img: "https://github.com/Bapoooossssaaaa/scpstuff/blob/main/Screenshot_2025-07-23_185316-removebg-preview.png?raw=true" }, "Medium": { name: "Medium Armor Plating", health: 25, img: "https://github.com/Bapoooossssaaaa/scpstuff/blob/main/Screenshot_2025-07-23_185316-removebg-preview.png?raw=true" }, "Heavy": { name: "Heavy Armor Plating", health: 50, img: "https://github.com/Bapoooossssaaaa/scpstuff/blob/main/Screenshot_2025-07-23_185316-removebg-preview.png?raw=true" } };
+        const musicPlaylist = [
+            { name: "Velvet Skyline", src: "https://github.com/Bapoooossssaaaa/scpstuff/raw/refs/heads/main/Velvet%20Skyline.mp3" },
+            { name: "Twilight Echoes", src: "https://github.com/Bapoooossssaaaa/scpstuff/raw/refs/heads/main/Twilight%20Echoes.mp3" },
+            { name: "Neon Reverie", src: "https://github.com/Bapoooossssaaaa/scpstuff/raw/refs/heads/main/Neon%20Reverie.mp3" },
+            { name: "Pulse Drift", src: "https://github.com/Bapoooossssaaaa/scpstuff/raw/refs/heads/main/Pulse%20Drift.mp3" },
+        ];
         
         // --- SECURITY & OBFUSCATION ---
         const auth_matrix = { "Main Force": "bW9uYXJjaA", "MR": "cGFyYWdvbg", "HR": "dGVyYWdyYW0", "VIP": "ZXhhdG9u" }; // Base64
 
         // --- STATE ---
-        let state = { username: '', rank: 'T-LR', selectedMorph: 'T-LR', deploymentSite: 'Site 45', morphOptions: {}, primaryWeapon: null, secondaryWeapon: null, misc: [], isDataLoaded: false };
+        let state = { username: '', rank: 'T-LR', role: 'Combatant', selectedMorph: 'T-LR', armor: 'Light', deploymentSite: 'Site 45', morphOptions: {}, primaryWeapon: null, secondaryWeapon: null, misc: [], isDataLoaded: false, isComplete: false, compareWeapon: null, lockedStatsItem: null };
         let previousRank = 'T-LR';
+        let currentSongIndex = 0;
+        let hasInteracted = false;
 
         // --- DOM ELEMENTS ---
         const dom = {
@@ -260,9 +327,13 @@
             settings: { container: document.getElementById('settings-container'), button: document.getElementById('settings-button'), menu: document.getElementById('settings-menu'), skip: document.getElementById('skip-button-main'), reset: document.getElementById('reset-button') },
             username: document.getElementById('username'), rank: document.getElementById('rank'),
             nextToMorph: document.getElementById('next-to-morph'), nextToArmory: document.getElementById('next-to-armory'),
+            nextToRole: document.getElementById('next-to-role'),
             nextToDeployment: document.getElementById('next-to-deployment'),
             morphOptions: document.getElementById('morph-options'), extraMorphOptions: document.getElementById('extra-morph-options'),
-            armory: document.getElementById('armory-categories'), siteOptions: document.getElementById('site-options'),
+            roleOptions: document.getElementById('role-options'),
+            armorOptions: document.getElementById('armor-options'),
+            armory: document.getElementById('armory-categories'), armoryContent: document.getElementById('armory-content'), siteOptions: document.getElementById('site-options'),
+            statsPanel: document.getElementById('stats-panel'),
             outputTitle: document.getElementById('output-title'), notepadOutput: document.getElementById('notepad-output'),
             copyButton: document.getElementById('copy-button'), finishButton: document.getElementById('finish-button'), copyFeedback: document.getElementById('copy-feedback'),
             timeDate: document.getElementById('time-date'),
@@ -277,9 +348,10 @@
             bgArmory: document.querySelector('.armory-bg'),
             intro: { screen: document.getElementById('intro-screen'), container: document.getElementById('intro-sequence-container'), logo: document.getElementById('intro-logo'), title: document.getElementById('intro-title'), buttons: document.getElementById('intro-buttons') },
             outroScreen: document.getElementById('outro-screen'),
+            music: { player: document.getElementById('audio-player'), mute: document.getElementById('mute-button'), volume: document.getElementById('volume-slider'), info: document.getElementById('song-info'), skip: document.getElementById('skip-song-button') },
         };
 
-        const DB = { save: (data) => localStorage.setItem('bpcMorphDataV12', JSON.stringify(data)), load: () => JSON.parse(localStorage.getItem('bpcMorphDataV12')), clear: () => localStorage.removeItem('bpcMorphDataV12') };
+        const DB = { save: (data) => localStorage.setItem('bpcMorphDataV14', JSON.stringify(data)), load: () => JSON.parse(localStorage.getItem('bpcMorphDataV14')), clear: () => localStorage.removeItem('bpcMorphDataV14') };
         
         // --- FUNCTIONS ---
         function validate_session() { return typeof state === 'object' && state !== null; }
@@ -296,12 +368,39 @@
             }
 
             if (screenId === 'output-screen') generateOutput();
+            if (screenId === 'role-screen') renderRoles();
             if (screenId === 'morph-screen') renderMorphs();
-            if (screenId === 'armory-screen') renderArmory();
+            if (screenId === 'armory-screen') {
+                state.lockedStatsItem = null;
+                state.compareWeapon = null;
+                renderArmory();
+                updateStatsPanel(null);
+            }
+        }
+
+        function renderRoles() {
+            dom.roleOptions.innerHTML = '';
+            const roles = ['Combatant', 'Civil', 'Recon'];
+            roles.forEach(role => {
+                const isSelected = state.role === role;
+                const card = document.createElement('div');
+                card.className = `border-2 rounded-lg p-6 text-center transition-all duration-300 cursor-pointer ${isSelected ? 'selected' : 'border-transparent'}`;
+                card.dataset.role = role;
+                card.innerHTML = `<h3 class="font-bold text-xl">${role}</h3>`;
+                card.addEventListener('click', () => { state.role = role; renderRoles(); });
+                dom.roleOptions.appendChild(card);
+            });
         }
 
         function renderMorphs() {
             dom.morphOptions.innerHTML = '';
+            if (state.role !== 'Combatant') {
+                dom.morphOptions.innerHTML = `<p class="text-gray-400 text-center col-span-full">Morphs for the ${state.role} role are currently a Work In Progress.</p>`;
+                dom.nextToArmory.disabled = true;
+                return;
+            }
+            dom.nextToArmory.disabled = false;
+
             const userRankIndex = rankOrder.indexOf(state.rank);
             rankOrder.forEach((rankKey, index) => {
                 const morph = morphs[rankKey];
@@ -340,26 +439,47 @@
                 dom.extraMorphOptions.appendChild(wrapper);
             });
         }
-
-        function isSMG(cmd) {
-            return cmd && armory['Submachine Guns'].hasOwnProperty(cmd);
-        }
-
+        
         function renderArmory() {
-            dom.armory.innerHTML = '';
+            // Render Armor
+            dom.armorOptions.innerHTML = '';
             const userRankIndex = rankOrder.indexOf(state.rank);
+            let armorHtml = `<h3 class="text-xl font-bold mb-3 text-yellow-300">Armor Plating</h3><div class="grid grid-cols-1 sm:grid-cols-3 gap-4">`;
+            Object.entries(armorPlating).forEach(([key, armor]) => {
+                let isDisabled = false;
+                if (key === 'Medium' && userRankIndex < rankOrder.indexOf('Main Force')) isDisabled = true;
+                if (key === 'Heavy' && userRankIndex < rankOrder.indexOf('MR')) isDisabled = true;
+                
+                const isSelected = state.armor === key;
+                armorHtml += `<label class="flex flex-col items-center p-4 rounded-lg border-2 bg-black/20 ${isDisabled ? 'item-disabled' : 'cursor-pointer'} ${isSelected && !isDisabled ? 'selected' : 'border-transparent'}">
+                    <input type="radio" name="armor" value="${key}" class="hidden" ${isSelected ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
+                    <img src="${armor.img}" class="w-24 h-24 object-contain mb-2">
+                    <h3 class="font-bold">${armor.name}</h3>
+                </label>`;
+            });
+            dom.armorOptions.innerHTML = armorHtml + `</div>`;
+
+            // Render Weapons
+            dom.armory.innerHTML = '';
             Object.entries(armory).forEach(([category, items]) => {
                 const div = document.createElement('div');
                 let html = `<h3 class="text-xl font-bold mb-3 text-yellow-300">${category}</h3><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">`;
                 Object.entries(items).forEach(([cmd, item]) => {
                     let isDisabled = false;
+                    if (state.role === 'Civil') {
+                        if (category === 'Rifles') isDisabled = true;
+                        if (category === 'Miscellaneous' && !['Medkit 5 Black', 'detain', 'auth_tool'].includes(cmd)) isDisabled = true;
+                    }
+                    if (cmd === 'auth_tool' && (state.role !== 'Civil' || userRankIndex > rankOrder.indexOf('Main Force'))) {
+                         return; // Don't even render it
+                    }
+
                     if (state.rank === 'T-LR') {
-                        if (category === 'Rifles' || category === 'Miscellaneous') isDisabled = true;
+                        if (category === 'Rifles' || (category === 'Miscellaneous' && cmd !== 'auth_tool')) isDisabled = true;
                     }
                     if (cmd === 'Crowbar' && userRankIndex < rankOrder.indexOf('MR')) isDisabled = true;
                     if (cmd === 'detain' && userRankIndex < rankOrder.indexOf('HR')) isDisabled = true;
                     
-
                     const isSelected = state.primaryWeapon === cmd || state.secondaryWeapon === cmd || state.misc.includes(cmd);
                     const isMisc = category === 'Miscellaneous';
                     html += `<div class="armory-item border-2 bg-black/30 p-2 rounded-lg transition-all duration-300 ${isDisabled ? 'item-disabled' : 'cursor-pointer'} ${isSelected && !isDisabled ? 'selected' : 'border-transparent'}" data-item-cmd="${cmd}" data-item-category="${category}" data-item-disabled="${isDisabled}">
@@ -369,6 +489,10 @@
                 dom.armory.appendChild(div);
             });
             dom.nextToDeployment.disabled = !state.primaryWeapon && !state.secondaryWeapon;
+        }
+
+        function isSMG(cmd) {
+            return cmd && armory['Submachine Guns'].hasOwnProperty(cmd);
         }
 
         function handleArmoryClick(e) {
@@ -410,7 +534,7 @@
         }
 
         function generateOutput() {
-            dom.outputTitle.textContent = `5 :: GENERATED FORMAT`;
+            dom.outputTitle.textContent = `6 :: GENERATED FORMAT`;
             const user = state.username || '{username}';
             const selectedMorphData = morphs[state.selectedMorph];
             if (!selectedMorphData) return;
@@ -429,8 +553,28 @@
             const gearItems = [state.primaryWeapon, state.secondaryWeapon, ...state.misc.filter(i => i !== medkitCmd)].filter(Boolean);
             let gearString = "EMF";
             if (gearItems.length > 0) gearString += `,${gearItems.join(',')}`;
-            if (state.misc.includes(medkitCmd)) gearString += `,${medkitCmd}`;
-            const outputArray = [`(${state.deploymentSite})`, `permhat ${user} ${hatString}`, `permshirt ${user} ${selectedMorphData.shirt}`, `permpants ${user} ${selectedMorphData.pants}`, `permface ${user} 0`, `permntag ${user} (TBD)`, `permrtag ${user} (TBD)`, `permcntag ${user} (TBD)`, `permcrtag ${user} (TBD)`, `permgear ${user} ${gearString}`, `permaxhealth ${user} (TBD)`, `heal ${user}`];
+            
+            const outputArray = [
+                `(${state.deploymentSite})`,
+                `permhat ${user} ${hatString}`, 
+                `permshirt ${user} ${selectedMorphData.shirt}`, 
+                `permpants ${user} ${selectedMorphData.pants}`, 
+                `permface ${user} 0`, 
+                `permntag ${user} (TBD)`, `permrtag ${user} (TBD)`, 
+                `permcntag ${user} (TBD)`, `permcrtag ${user} (TBD)`,
+            ];
+            
+            if (gearString !== "EMF") {
+                 outputArray.push(`startergear ${user} ${gearString}`);
+            }
+            if (state.misc.includes(medkitCmd)) {
+                outputArray.push(`startergear ${user} ${medkitCmd}`);
+            }
+
+            outputArray.push(
+                `permaxhealth ${user} ${100 + armorPlating[state.armor].health}`,
+                `heal ${user}`
+            );
             dom.notepadOutput.textContent = outputArray.join('\n');
         }
 
@@ -468,14 +612,20 @@
             }
         }
 
-        function saveData() { if (state.isDataLoaded) DB.save(state); }
+        function saveData(isFinal = false) { 
+            if (isFinal) state.isComplete = true;
+            if (state.isDataLoaded) DB.save(state); 
+        }
+
         function loadData() {
             const loadedState = DB.load();
             if (loadedState) {
-                console.log("Returning user detected. Displaying settings.");
                 if (morphs[loadedState.selectedMorph]) state = loadedState;
-                dom.skipButton.classList.remove('hidden');
-                dom.settings.container.classList.remove('hidden');
+                if (state.isComplete) {
+                    console.log("Returning user detected with completed session. Displaying settings.");
+                    dom.skipButton.classList.remove('hidden');
+                    dom.settings.container.classList.remove('hidden');
+                }
             }
             state.isDataLoaded = true;
             dom.username.value = state.username; dom.rank.value = state.rank; previousRank = state.rank;
@@ -501,14 +651,113 @@
             dom.timeDate.textContent = new Date().toLocaleString();
         }
 
+        function updateStatsPanel(itemData, compareData = null) {
+            if (!itemData) {
+                dom.statsPanel.innerHTML = `<p class="text-gray-400 text-center mt-4">Hover over an item to see details.</p>`;
+                return;
+            }
+
+            let statsHtml;
+            if (compareData) {
+                statsHtml = getComparisonHtml(itemData, compareData);
+            } else {
+                statsHtml = getSingleItemHtml(itemData);
+            }
+            
+            dom.statsPanel.innerHTML = statsHtml;
+        }
+
+        function getSingleItemHtml(itemData) {
+            let html = `<h4 class="font-bold text-lg text-yellow-400 mb-2">${itemData.name}</h4>`;
+            if (itemData.stats) {
+                html += '<div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">';
+                for(const [key, value] of Object.entries(itemData.stats)) {
+                    html += `<span class="text-gray-400">${key}:</span><span>${value}</span>`;
+                }
+                html += '</div>';
+            }
+            if (itemData.stats && !itemData.stats.Description) {
+                 html += `<button id="compare-button" class="btn w-full mt-4 text-sm py-1">Compare</button>`;
+            }
+            return html;
+        }
+
+        function getComparisonHtml(base, compare) {
+            let html = `<h4 class="font-bold text-lg text-yellow-400 mb-2">${base.name} vs ${compare.name}</h4>`;
+            html += '<div class="grid grid-cols-3 gap-x-2 gap-y-1 text-sm">';
+            
+            const higherIsBetter = ["Base Damage", "Rate of Fire", "Magazine Size", "Reserve Ammo", "Muzzle Velocity"];
+            const lowerIsBetter = ["Reload Time", "Weight"];
+
+            for(const key in base.stats) {
+                if (compare.stats && compare.stats.hasOwnProperty(key)) {
+                    const baseVal = parseFloat(base.stats[key]);
+                    const compareVal = parseFloat(compare.stats[key]);
+                    let arrow = '<span class="text-gray-500">=&nbsp;</span>';
+                    let colorClass = 'text-gray-400';
+
+                    if (!isNaN(baseVal) && !isNaN(compareVal)) {
+                        if (higherIsBetter.includes(key)) {
+                            if (compareVal > baseVal) { arrow = '<span class="text-green-500">▲</span>'; colorClass = 'text-green-400'; }
+                            else if (compareVal < baseVal) { arrow = '<span class="text-red-500">▼</span>'; colorClass = 'text-red-400'; }
+                        } else if (lowerIsBetter.includes(key)) {
+                            if (compareVal < baseVal) { arrow = '<span class="text-green-500">▲</span>'; colorClass = 'text-green-400'; }
+                            else if (compareVal > baseVal) { arrow = '<span class="text-red-500">▼</span>'; colorClass = 'text-red-400'; }
+                        }
+                    }
+
+                    html += `<span class="text-gray-400 col-span-2">${key}:</span><span class="${colorClass}">${arrow}${compare.stats[key]}</span>`;
+                }
+            }
+            html += '</div>';
+            html += `<button id="stop-compare-button" class="btn w-full mt-4 text-sm py-1">Stop Comparing</button>`;
+            return html;
+        }
+
+        // --- MUSIC PLAYER ---
+        function playNextSong(isSkip = false) {
+            if (!hasInteracted) return;
+            if (isSkip) {
+                let nextIndex;
+                do {
+                    nextIndex = Math.floor(Math.random() * musicPlaylist.length);
+                } while (nextIndex === currentSongIndex);
+                currentSongIndex = nextIndex;
+            } else {
+                 currentSongIndex = (currentSongIndex + 1) % musicPlaylist.length;
+            }
+            const song = musicPlaylist[currentSongIndex];
+            dom.music.player.src = song.src;
+            dom.music.player.play().catch(e => console.log("Audio play failed, waiting for interaction."));
+            dom.music.info.textContent = `Playing: ${song.name}`;
+        }
+
         // --- EVENT LISTENERS ---
+        document.body.addEventListener('click', () => {
+            if(!hasInteracted) {
+                hasInteracted = true;
+                playNextSong(true); // Randomize first song
+            }
+        }, { once: true });
+
+        dom.music.player.addEventListener('ended', () => playNextSong(false));
+        dom.music.skip.addEventListener('click', () => playNextSong(true));
+        dom.music.volume.addEventListener('input', (e) => dom.music.player.volume = e.target.value);
+        dom.music.mute.addEventListener('click', () => {
+            dom.music.player.muted = !dom.music.player.muted;
+            dom.music.mute.innerHTML = dom.music.player.muted 
+                ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l-4-4m0 4l4-4" /></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>`;
+        });
+
+
         dom.introButton.addEventListener('click', () => showScreen('user-details-screen'));
         dom.skipButton.addEventListener('click', () => showScreen('output-screen'));
         dom.settings.skip.addEventListener('click', () => showScreen('output-screen'));
         dom.settings.reset.addEventListener('click', () => { if (confirm("Are you sure you want to reset all saved data? This action cannot be undone.")) { DB.clear(); location.reload(); } });
         dom.settings.button.addEventListener('click', () => dom.settings.menu.classList.toggle('hidden'));
         dom.navButtons.forEach(button => button.addEventListener('click', (e) => showScreen(e.target.dataset.target)));
-        dom.nextToMorph.addEventListener('click', () => { if (dom.username.value.trim() === '') { showError('Username is required to proceed.'); return; } showScreen('morph-screen'); });
+        dom.nextToRole.addEventListener('click', () => { if (dom.username.value.trim() === '') { showError('Username is required to proceed.'); return; } showScreen('role-screen'); });
         dom.nextToDeployment.addEventListener('click', () => {
             if (!state.primaryWeapon && !state.secondaryWeapon) {
                 showError('Loadout violation: You must select at least one Primary or Secondary weapon to proceed.');
@@ -521,11 +770,45 @@
         dom.submitRankCode.addEventListener('click', handleRankCodeSubmit);
         dom.cancelRankCode.addEventListener('click', () => { dom.rank.value = previousRank; dom.modalContainer.style.display = 'none'; });
         dom.errorOkButton.addEventListener('click', () => dom.modalContainer.style.display = 'none');
-        dom.armory.addEventListener('click', handleArmoryClick);
+        
+        dom.armoryContent.addEventListener('mouseover', (e) => { 
+            const itemEl = e.target.closest('.armory-item');
+            if (itemEl) {
+                const cmd = itemEl.dataset.itemCmd;
+                const category = itemEl.dataset.itemCategory;
+                if (armory[category] && armory[category][cmd]) {
+                    const itemData = armory[category][cmd];
+                    if (state.compareWeapon) {
+                        updateStatsPanel(state.compareWeapon, itemData);
+                    } else {
+                        state.lockedStatsItem = itemData;
+                        updateStatsPanel(itemData);
+                    }
+                }
+            }
+        });
+       
+        dom.armoryContent.addEventListener('click', (e) => {
+            const itemEl = e.target.closest('.armory-item');
+            if (itemEl) handleArmoryClick(e);
+        });
+        dom.armoryContent.addEventListener('change', (e) => { if (e.target.name === 'armor') { state.armor = e.target.value; saveData(); renderArmory(); }});
+        
+        dom.statsPanel.addEventListener('click', (e) => {
+            if (e.target.id === 'compare-button') {
+                state.compareWeapon = state.lockedStatsItem;
+                dom.statsPanel.innerHTML = `<p class="text-gray-400 text-center mt-4">Comparing ${state.compareWeapon.name}.<br><br>Hover over another weapon to see differences.</p><button id="stop-compare-button" class="btn w-full mt-4 text-sm py-1">Stop Comparing</button>`;
+            }
+            if (e.target.id === 'stop-compare-button') {
+                state.compareWeapon = null;
+                updateStatsPanel(state.lockedStatsItem);
+            }
+        });
+
         dom.extraMorphOptions.addEventListener('change', (e) => { const input = e.target.closest('.morph-option-input'); if (!input) return; state.morphOptions[input.dataset.optionKey] = input.value; renderAll(); });
         dom.siteOptions.addEventListener('change', (e) => { state.deploymentSite = e.target.value; saveData(); });
         dom.copyButton.addEventListener('click', () => {
-            saveData();
+            saveData(true);
             const textToCopy = dom.notepadOutput.textContent;
             const tempTextArea = document.createElement('textarea');
             tempTextArea.value = textToCopy;
@@ -537,7 +820,7 @@
             setTimeout(() => { dom.copyFeedback.style.opacity = '0'; }, 2000);
         });
         dom.finishButton.addEventListener('click', () => {
-            saveData();
+            saveData(true);
             dom.outroScreen.style.display = 'flex';
             setTimeout(() => {
                 location.reload();
@@ -551,6 +834,7 @@
             runIntro();
             updateTime();
             setInterval(updateTime, 1000);
+            dom.music.player.volume = 0.3;
         }
         init();
     </script>
