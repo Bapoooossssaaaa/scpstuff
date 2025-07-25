@@ -688,7 +688,10 @@
             if (affiliation && !selectedMorphData.noPatch) hatString += `,${affiliation.id}`;
             hatString = hatString.replace(/,+/g, ',').replace(/^,|,$/g, '');
             const medkitCmd = "Medkit 5 Black";
-            const gearItems = [state.primaryWeapon, state.secondaryWeapon, ...state.misc.filter(i => i !== medkitCmd)].filter(Boolean);
+            const gearItems = [state.primaryWeapon, state.secondaryWeapon, ...state.misc.filter(i => i !== medkitCmd)]
+                .filter(Boolean)
+                .map(item => item === 'auth_tool' ? 'auth' : item);;
+            
             let gearString = "EMF";
             if (gearItems.length > 0) gearString += `,${gearItems.join(',')}`;
             
